@@ -7,3 +7,17 @@ router.get('/', function(req, res, next) {
 });
 
 module.exports = router;
+
+/**
+ * @wagger
+ * /unauthorized:
+ *  get:
+ *    summary: Get unauthorized page
+ *    responses:
+ *      200:
+ *        description: An unauthorized page
+ *      401:
+ *         description: Unauthorized
+ * 
+ * 
+ */

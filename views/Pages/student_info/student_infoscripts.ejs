@@ -28,7 +28,7 @@
                     element.ms_status,
                     element.ms_created_by,
                     element.ms_created_date,
-                    `<div class="d-flex align-items-center justify-content-center" ><button type="button" class="btn btn-primary w-100 see-btn" data-id="${element.ms_student_id}"><i style="" class=" fas fa-fw fa-eye"></i></button><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-id="${element.ms_id}" data-ms_student_id="${element.ms_student_id}" data-ms_first_name="${element.ms_first_name}" data-ms_middle_name="${element.ms_middle_name}" data-ms_last_name="${element.ms_last_name}" data-ms_date_of_birth="${element.ms_date_of_birth}" data-ms_contact_no="${element.ms_contact_no}" data-ms_email="${element.ms_email}" data-ms_address="${element.ms_address}" data-ms_status="${element.ms_status}" data-ms_created_by="${element.ms_created_by}" data-ms_created_date="${element.ms_created_date}"><i style="" class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn " data-id="${element.ms_id}"><i style="" class=" fas fa-fw fa-trash"></i></button></div>`,
+                    `<div class="d-flex align-items-center justify-content-center" ><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-id="${element.ms_id}" data-ms_student_id="${element.ms_student_id}" data-ms_first_name="${element.ms_first_name}" data-ms_middle_name="${element.ms_middle_name}" data-ms_last_name="${element.ms_last_name}" data-ms_date_of_birth="${element.ms_date_of_birth}" data-ms_contact_no="${element.ms_contact_no}" data-ms_email="${element.ms_email}" data-ms_address="${element.ms_address}" data-ms_status="${element.ms_status}" data-ms_created_by="${element.ms_created_by}" data-ms_created_date="${element.ms_created_date}"><i style="" class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn " data-id="${element.ms_id}"><i style="" class=" fas fa-fw fa-trash"></i></button></div>`,
                     
                 ]);
                 });
@@ -39,32 +39,6 @@
 
 
 
-        $(document).on('click', '.see-btn', function () {
-            var studentId = $(this).data('id');
-            $('#seeStudentModal').modal('show');
-            console.log(studentId);
-            
-            $.ajax({
-            url: `/student_info/get-student-grade/${studentId}`,
-            type: "GET",
-            success: function (data) {
-                console.log(data.data);
-                var table = $('#student_grade_table').DataTable();
-                table.clear();
-                data.data.forEach(element => {
-                table.row.add([
-                    element.sg_term,
-                    element.sg_subject_id,
-                    element.sg_grades,
-                    element.sg_final_grade,
-                    element.sg_status,
-                    
-                ]);
-                });
-                table.draw();
-            }
-            });
-        });
 
 
 

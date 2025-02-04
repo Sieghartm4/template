@@ -58,3 +58,17 @@ router.post('/check-credentials', (req, res) => {
 
 
 module.exports = router;
+/**
+ * @swagger
+ * /login:
+ *   get:
+ *     summary: Render the login page
+ *     responses:
+ *       200:
+ *         description: A login page
+ *         content:
+ *           text/html:
+ *             schema:
+ *               type: string
+ */
+

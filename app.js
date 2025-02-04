@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mysql = require("mysql");
 var session = require('express-session');
+var swaggerJSDoc = require('swagger-jsdoc');
+var swaggerUi = require('swagger-ui-express');
 
 const { mongoose, store } = require('./middleware/mongoose');
 const {CheckConnection} = require('./routes/repository/db_connect');
@@ -38,6 +40,31 @@ app.use((req, res, next) => {
   next();
 });
 */
+
+const swaggerDefinition = {
+  openapi: '3.0.0',
+  info: {
+    title: 'Enrollment System API',
+    version: '1.0.0',
+    description: 'This is the API documentation',
+  },
+  servers: [
+    {
+      url: 'http://localhost:3000',
+    },
+  ],
+};
+
+const options = {
+  swaggerDefinition,
+  apis: ['./routes/*.js'],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+
+
 app.set('views', path.join(__dirname, 'views/Layouts'));
 app.set('view engine', 'ejs');
 

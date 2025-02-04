@@ -11,6 +11,7 @@
 
             if (loginData.mu_email === '' || loginData.mu_password === '') {
                 $('#requiredFieldsModal').modal('show');
+                $('#confirmInsertModal').modal('hide');
                 return;
             }
 

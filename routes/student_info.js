@@ -34,26 +34,6 @@ router.get('/get-student-info',(req, res) => {
   }
 });
 
-router.get('/get-student-grade/:ms_id', (req, res) => {  
-  try {
-    const { ms_id } = req.params;
-    console.log(ms_id);
-    let sql = `SELECT * FROM student_grade WHERE sg_student_id = ?`;
-
-    SELECT2(sql, [ms_id], (err, result) => {
-      if (err) {
-        res.status(500).json({message: err});
-      } else {
-        res.status(200).json({
-          message: result,
-          data: result
-        });
-      }
-    });
-  } catch (error) {
-    res.status(500).json({message: error});
-  }
-});
 
 router.put('/update-student-info/:ms_id', (req, res) => {  
   try {

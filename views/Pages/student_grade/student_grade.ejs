@@ -38,11 +38,8 @@
                                 </div>
                                 <div class="col-md-3 mb-3">
                                     <label for="sg_school_year" class="form-label">School Year:</label>
-                                    <div class="d-flex align-items-center">
-                                        <label for="start" class="form-label">Start:</label>
-                                        <input type="date" class="form-control" id="sg_school_year"
-                                            name="sg_school_year" placeholder="2024...">
-                                    </div>
+                                        <input type="text" class="form-control" id="sg_school_year"
+                                            name="sg_school_year" placeholder="2024-2025...">
                                 </div>
                             </div>
                             <div class="row">
@@ -119,7 +116,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="editStudentForm">
-                        <input type="text" id="edit_sg_id" name="edit_sg_id">
+                        <input type="hidden" id="edit_sg_id" name="edit_sg_id">
                         <div class="form-group">
                             <label for="edit_sg_student_id" class="form-label">Student</label>
                             <select name="edit_sg_student_id" id="edit_sg_student_id" class="form-select w-100 p-1"
@@ -133,13 +130,13 @@
                             <label for="edit_sg_subject_id" class="form-label">Subjects</label>
                             <select name="edit_sg_subject_id" id="edit_sg_subject_id" class="form-select w-100 p-1"
                                 aria-label="Default select example" style="border-radius:5px;">
-                                <option value="123">Math</option>
-                                <option value="234">Web Development</option>
+                                <option value="3">Math</option>
+                                <option value="4">Web Development</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="edit_sg_school_year" class="form-label">School Year</label>
-                            <input type="date" class="form-control" id="edit_sg_school_year" name="edit_sg_school_year">
+                            <input type="text" class="form-control" id="edit_sg_school_year" name="edit_sg_school_year" placeholder="2024-2025...">
                         </div>
                         <div class="form-group">
                             <label for="edit_sg_term" class="form-label">Term</label>

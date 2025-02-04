@@ -12,7 +12,6 @@ router.get('/', function(req, res, next) {
 
 module.exports = router;
 
-
 router.get('/get-student-tuition',(req, res) => {  
   try {
     let sql = "SELECT * FROM student_tuition_fee";
