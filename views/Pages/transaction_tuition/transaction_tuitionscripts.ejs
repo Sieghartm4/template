@@ -1,0 +1,149 @@
+<script>
+    $(document).ready(function () {
+
+        LoadTable();
+
+        function LoadTable() {
+            console.log("LoadTable");
+
+            $.ajax({
+                url: "/transaction_tuition/get-transaction-tuition",
+                type: "GET",
+                success: function (data) {
+                    console.log(data.data);
+                    var table = $('#transaction_tuition_table').DataTable();
+                    table.clear();
+                    data.data.forEach(element => {
+                        table.row.add([
+                            element.ttf_id,
+                            element.ttf_tuition_fee_id,
+                            element.ttf_mode_of_payment,
+                            element.ttf_amount,
+                            element.ttf_previous_balance,
+                            element.ttf_current_balance,
+                            element.ttf_received_by,
+                            element.ttf_paid_by,
+                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-ttf_id="${element.ttf_id}" data-ttf_tuition_fee_id="${element.ttf_tuition_fee_id}" data-ttf_mode_of_payment="${element.ttf_mode_of_payment}" data-ttf_amount="${element.ttf_amount}" data-ttf_previous_balance="${element.ttf_previous_balance}" data-ttf_current_balance="${element.ttf_current_balance}" data-ttf_received_by="${element.ttf_received_by}" data-ttf_paid_by="${element.ttf_paid_by}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.ttf_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+                        
+                        ]);
+                    });
+                    table.draw();
+                }
+            });
+        }
+        $('#save_edit').on('click', function () {
+            $('#confirmEditModal').modal('show');
+            $('#editTransactionModal').modal('hide');
+        });
+        $(document).on('click', '#confirmEditBtn', function () {
+            $('#confirmEditModal').modal('hide');
+            var ttf_id = $('#edit_ttf_id').val();
+            var editedTransactionTuitionData = {
+                ttf_id: ttf_id,
+                ttf_tuition_fee_id: $('#edit_ttf_tuition_fee_id').val(),
+                ttf_mode_of_payment: $('#edit_ttf_mode_of_payment').val(),
+                ttf_amount: $('#edit_ttf_amount').val(),
+                ttf_previous_balance: $('#edit_ttf_previous_balance').val(),
+                ttf_current_balance: $('#edit_ttf_current_balance').val(),
+                ttf_received_by: $('#edit_ttf_received_by').val(),
+                ttf_paid_by: $('#edit_ttf_paid_by').val()
+            };
+
+            $.ajax({
+                url: `/transaction_tuition/put-transaction-tuition/${ttf_id}`,
+                type: 'PUT',
+                data: editedTransactionTuitionData,
+                success: function (response) {
+                    console.log('Transaction tuition data updated successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error updating transaction tuition data:', err);
+                }
+            });
+
+            $('#confirmInsertData').modal('hide');
+        });
+
+        $(document).on('click', '.edit-btn', function () {
+            var transactionTuitionData = $(this).data();
+            $('#editTransactionModal').modal('show').on('shown.bs.modal', function () {
+                $('#edit_ttf_id').val(transactionTuitionData.ttf_id);
+                $('#edit_ttf_tuition_fee_id').val(transactionTuitionData.ttf_tuition_fee_id);
+                $('#edit_ttf_mode_of_payment').val(transactionTuitionData.ttf_mode_of_payment);
+                $('#edit_ttf_amount').val(transactionTuitionData.ttf_amount);
+                $('#edit_ttf_previous_balance').val(transactionTuitionData.ttf_previous_balance);
+                $('#edit_ttf_current_balance').val(transactionTuitionData.ttf_current_balance);
+                $('#edit_ttf_received_by').val(transactionTuitionData.ttf_received_by);
+                $('#edit_ttf_paid_by').val(transactionTuitionData.ttf_paid_by);
+            });
+        });
+
+        $('#submitFormBtn').on('click', function (event) {
+            event.preventDefault();
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var transaction_tuitionData = {
+                ttf_tuition_fee_id: $('#ttf_tuition_fee_id').val(),
+                ttf_mode_of_payment: $('#ttf_mode_of_payment').val(),
+                ttf_amount: $('#ttf_amount').val(),
+                ttf_previous_balance: $('#ttf_previous_balance').val(),
+                ttf_current_balance: $('#ttf_current_balance').val(),
+                ttf_received_by: $('#ttf_received_by').val(),
+                ttf_paid_by: $('#ttf_paid_by').val()
+            };
+            for (var key in transaction_tuitionData) {
+                if (transaction_tuitionData[key] === '') {
+                    $('#requiredFieldsModal').modal('show');
+                    $('#confirmInsertModal').modal('hide');
+                    return;
+                }
+            }
+            $.ajax({
+                url: '/transaction_tuition/post-transaction-tuition',
+                type: 'POST',
+                data: transaction_tuitionData,
+                success: function (response) {
+                    console.log('Transaction tuition data inserted successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error inserting transaction tuition data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+        });
+
+        $(document).on('click', '.delete-btn', function () {
+            var transaction_tuitionId = $(this).data('id');
+            $('#confirmDeleteModal').data('id', transaction_tuitionId).modal('show');
+        });
+
+        $('#confirmDeleteBtn').on('click', function () {
+            var transaction_tuitionId = $('#confirmDeleteModal').data('id');
+            deleteTransactionTuition(transaction_tuitionId);
+            $('#confirmDeleteModal').modal('hide');
+        });
+
+        function deleteTransactionTuition(transaction_tuitionId) {
+            if (!transaction_tuitionId) {
+                console.error('Invalid transaction ID:', transaction_tuitionId);
+                return;
+            }
+            $.ajax({
+                url: `/transaction_tuition/delete-transaction-tuition/${transaction_tuitionId}`,
+                type: "DELETE",
+                success: function (response) {
+                    console.log(response.message);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error deleting transaction tuition:', err);
+                }
+            });
+        }
+
+    });
+</script>

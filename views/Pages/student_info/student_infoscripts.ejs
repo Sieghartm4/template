@@ -1,0 +1,286 @@
+<script>
+    $(document).ready(function () {
+        LoadTable();
+
+        function LoadTable() {
+            console.log("LoadTable");
+
+            $.ajax({
+            url: "/student_info/get-student-info",
+            type: "GET",
+            success: function (data) {
+                console.log(data.data);
+                var table = $('#student_info_table').DataTable();
+                table.clear();
+                data.data.forEach(element => {
+                var imgSrc = element.ms_image ? `data:image/jpeg;base64,${element.ms_image}` : '';
+                table.row.add([
+                    element.ms_id,
+                    element.ms_student_id,
+                    element.ms_first_name,
+                    element.ms_middle_name,
+                    element.ms_last_name,
+                    element.ms_date_of_birth,
+                    element.ms_contact_no,
+                    element.ms_email,
+                    element.ms_address,
+                    `<img src="${imgSrc}" alt="Student Image" style="width: 50px; height: 50px;" />`,
+                    element.ms_status,
+                    element.ms_created_by,
+                    element.ms_created_date,
+                    `<div class="d-flex align-items-center justify-content-center" ><button type="button" class="btn btn-primary w-100 see-btn" data-id="${element.ms_student_id}"><i style="" class=" fas fa-fw fa-eye"></i></button><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-id="${element.ms_id}" data-ms_student_id="${element.ms_student_id}" data-ms_first_name="${element.ms_first_name}" data-ms_middle_name="${element.ms_middle_name}" data-ms_last_name="${element.ms_last_name}" data-ms_date_of_birth="${element.ms_date_of_birth}" data-ms_contact_no="${element.ms_contact_no}" data-ms_email="${element.ms_email}" data-ms_address="${element.ms_address}" data-ms_status="${element.ms_status}" data-ms_created_by="${element.ms_created_by}" data-ms_created_date="${element.ms_created_date}"><i style="" class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn " data-id="${element.ms_id}"><i style="" class=" fas fa-fw fa-trash"></i></button></div>`,
+                    
+                ]);
+                });
+                table.draw();
+            }
+            });
+        }
+
+
+
+        $(document).on('click', '.see-btn', function () {
+            var studentId = $(this).data('id');
+            $('#seeStudentModal').modal('show');
+            console.log(studentId);
+            
+            $.ajax({
+            url: `/student_info/get-student-grade/${studentId}`,
+            type: "GET",
+            success: function (data) {
+                console.log(data.data);
+                var table = $('#student_grade_table').DataTable();
+                table.clear();
+                data.data.forEach(element => {
+                table.row.add([
+                    element.sg_term,
+                    element.sg_subject_id,
+                    element.sg_grades,
+                    element.sg_final_grade,
+                    element.sg_status,
+                    
+                ]);
+                });
+                table.draw();
+            }
+            });
+        });
+
+
+
+        $('#save_edit').on('click', function () {
+            $('#confirmEditModal').modal('show');
+            $('#editStudentModal').modal('hide');
+        });
+        $(document).on('click', '#confirmEditBtn', function () {
+            $('#confirmEditModal').modal('hide');
+            var ms_id = $('#edit_id').val();
+            var editedStudentData = {
+            ms_id: ms_id,
+            ms_student_id: $('#edit_student_id').val(),
+            ms_first_name: $('#edit_first_name').val(),
+            ms_middle_name: $('#edit_middle_name').val(),
+            ms_last_name: $('#edit_last_name').val(),
+            ms_date_of_birth: $('#edit_date_of_birth').val(),
+            ms_contact_no: $('#edit_contact_no').val(),
+            ms_email: $('#edit_email').val(),
+            ms_address: $('#edit_address').val(),
+            ms_image: '',
+            ms_status: $('#edit_status').val(),
+            
+            ms_created_by: $('#edit_created_by').val(),
+            ms_created_date: $('#edit_created_date').val()
+            };
+            var file = $('#edit_image')[0].files[0];
+            if (file) {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                var img = new Image();
+                img.src = reader.result;
+                img.onload = function () {
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                var maxWidth = 500;
+                var maxHeight = 500;
+                var width = img.width;
+                var height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                    }
+                }
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+                editedStudentData.ms_image = canvas.toDataURL('image/jpeg').split(',')[1];
+                sendEditedStudentData(editedStudentData);
+                };
+            };
+            reader.readAsDataURL(file);
+            } else {
+            sendEditedStudentData(editedStudentData);
+            }
+
+            function sendEditedStudentData(data) {
+            $.ajax({
+                url: `/student_info/update-student-info/${ms_id}`,
+                type: 'PUT',
+                data: data,
+                success: function (response) {
+                console.log('Student data updated successfully:', response);
+                LoadTable();
+                },
+                error: function (err) {
+                console.error('Error updating student data:', err);
+                }
+            });
+            }
+
+            $('#editStudentModal').modal('hide');
+        });
+
+        $(document).on('click', '.edit-btn', function () {
+            var studentData = $(this).data();
+            $('#editStudentModal').modal('show').on('shown.bs.modal', function () {
+                $('#edit_id').val(studentData.id);
+                $('#edit_student_id').val(studentData.ms_student_id);
+                $('#edit_first_name').val(studentData.ms_first_name);
+                $('#edit_middle_name').val(studentData.ms_middle_name);
+                $('#edit_last_name').val(studentData.ms_last_name);
+                $('#edit_date_of_birth').val(studentData.ms_date_of_birth);
+                $('#edit_contact_no').val(studentData.ms_contact_no);
+                $('#edit_email').val(studentData.ms_email);
+                $('#edit_address').val(studentData.ms_address);
+                $('#edit_status').val(studentData.ms_status);
+                $('#edit_created_by').val(studentData.ms_created_by);
+                $('#edit_created_date').val(studentData.ms_created_date);
+            });
+        });
+
+
+
+
+
+
+
+        $('#submitFormBtn').on('click', function () {
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var studentData = {
+            ms_student_id: $('#ms_student_id').val(),
+            ms_first_name: $('#ms_first_name').val(),
+            ms_middle_name: $('#ms_middle_name').val(),
+            ms_last_name: $('#ms_last_name').val(),
+            ms_date_of_birth: $('#ms_date_of_birth').val(),
+            ms_contact_no: $('#ms_contact_no').val(),
+            ms_email: $('#ms_email').val(),
+            ms_address: $('#ms_address').val(),
+            ms_image: '',
+            ms_status: $('#ms_status').val(),
+            ms_created_by: $('#ms_created_by').val(),
+            ms_created_date: $('#ms_created_date').val()
+            };
+
+            for (var key in studentData) {
+            if (studentData[key] === '' && key !== 'ms_image') {
+                $('#requiredFieldsModal').modal('show');
+                $('#confirmInsertModal').modal('hide');
+                return;
+            }
+            }
+
+            var file = $('#ms_image')[0].files[0];
+            if (file) {
+            var reader = new FileReader();
+            reader.onloadend = function () {
+                var img = new Image();
+                img.src = reader.result;
+                img.onload = function () {
+                    var canvas = document.createElement('canvas');
+                    var ctx = canvas.getContext('2d');
+                    var maxWidth = 500;
+                    var maxHeight = 500;
+                    var width = img.width;
+                    var height = img.height;
+
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    studentData.ms_image = canvas.toDataURL('image/jpeg').split(',')[1];
+                    sendStudentData(studentData);
+                };
+            };
+            reader.readAsDataURL(file);
+            } else {
+            sendStudentData(studentData);
+            }
+
+            function sendStudentData(data) {
+            $.ajax({
+                url: '/student_info/post-student-info',
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                console.log('Student data inserted successfully:', response);
+                LoadTable();
+                },
+                error: function (err) {
+                console.error('Error inserting student data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+            }
+        });
+
+
+
+        $(document).on('click', '.delete-btn', function () {
+            var studentId = $(this).data('id');
+            $('#confirmDeleteModal').data('id', studentId).modal('show');
+        });
+
+        $('#confirmDeleteBtn').on('click', function () {
+            var studentId = $('#confirmDeleteModal').data('id');
+            deleteStudent(studentId);
+            $('#confirmDeleteModal').modal('hide');
+        });
+
+        function deleteStudent(studentId) {
+            if (!studentId) {
+                console.error('Invalid student ID:', studentId);
+                return;
+            }
+            $.ajax({
+                url: `/student_info/delete-student-info/${studentId}`,
+                type: "DELETE",
+                success: function (response) {
+                    console.log(response.message);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error deleting student:', err);
+                }
+            });
+        }
+    });
+</script>

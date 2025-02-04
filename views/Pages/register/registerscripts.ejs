@@ -1,0 +1,37 @@
+<script>
+        $(document).ready(function () {
+            $('#submitFormBtn').on('click', function () {
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var adminData = {
+                mu_fullname: $('#mu_fullname').val(),
+                mu_email: $('#mu_email').val(),
+                mu_username: $('#mu_username').val(),
+                mu_password: $('#mu_password').val()
+                
+            };
+            for (var key in adminData) {
+            if (adminData[key] === '') {
+                $('#requiredFieldsModal').modal('show');
+                $('#confirmInsertModal').modal('hide');
+                return;
+            }
+            }
+            $.ajax({
+                url: '/register/post-register',
+                type: 'POST',
+                data: adminData,
+                success: function (response) {
+                    console.log('Admin data inserted successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error inserting admin data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+        });
+        });
+</script>

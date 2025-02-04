@@ -1,0 +1,152 @@
+<script>
+    $(document).ready(function () {
+
+        LoadTable();
+
+        function LoadTable() {
+            console.log("LoadTable");
+
+            $.ajax({
+                url: "/student_grade/get-student-grade",
+                type: "GET",
+                success: function (data) {
+                    console.log(data.data);
+                    var table = $('#student_grade_table').DataTable();
+                    table.clear();
+                    data.data.forEach(element => {
+                        table.row.add([
+                            element.sg_id,
+                            element.sg_student_id,
+                            element.sg_subject_id,
+                            element.sg_school_year,
+                            element.sg_term,
+                            element.sg_grades,
+                            element.sg_final_grade,
+                            element.sg_status,
+                            `<div class="d-flex justify-content-center align-items-center" ><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-sg_id="${element.sg_id}" data-sg_student_id="${element.sg_student_id}" data-sg_subject_id="${element.sg_subject_id}" data-sg_school_year="${element.sg_school_year}" data-sg_term="${element.sg_term}" data-sg_grades="${element.sg_grades}" data-sg_final_grade="${element.sg_final_grade}" data-sg_status="${element.sg_status}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.sg_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+                            
+                        ]);
+                    });
+                    table.draw();
+                }
+            });
+        }
+
+        $('#save_edit').on('click', function () {
+            $('#confirmEditModal').modal('show');
+            $('#editStudentModal').modal('hide');
+        });
+        $(document).on('click', '#confirmEditBtn', function () {
+            $('#confirmEditModal').modal('hide');
+            var sg_id = $('#edit_sg_id').val();
+            var editedStudentGradeData = {
+            sg_id: sg_id,
+            sg_student_id: $('#edit_sg_student_id').val(),
+            sg_subject_id: $('#edit_sg_subject_id').val(),
+            sg_school_year: $('#edit_sg_school_year').val(),
+            sg_term: $('#edit_sg_term').val(),
+            sg_grades: $('#edit_sg_grades').val(),
+            sg_final_grade: $('#edit_sg_final_grade').val(),
+            sg_status: $('#edit_sg_status').val()
+            };
+
+            $.ajax({
+            url: `/student_grade/put-student-grade/${sg_id}`,
+            type: 'PUT',
+            data: editedStudentGradeData,
+            success: function (response) {
+                console.log('Student grade data updated successfully:', response);
+                LoadTable();
+            },
+            error: function (err) {
+                console.error('Error updating student grade data:', err);
+            }
+            });
+
+            $('#editStudentModal').modal('hide');
+        });
+
+        $(document).on('click', '.edit-btn', function () {
+            var studentGradeData = $(this).data();
+            $('#editStudentModal').modal('show').on('shown.bs.modal', function () {
+            $('#edit_sg_id').val(studentGradeData.sg_id);
+            $('#edit_sg_student_id').val(studentGradeData.sg_student_id);
+            $('#edit_sg_subject_id').val(studentGradeData.sg_subject_id);
+            $('#edit_sg_school_year').val(studentGradeData.sg_school_year);
+            $('#edit_sg_term').val(studentGradeData.sg_term);
+            $('#edit_sg_grades').val(studentGradeData.sg_grades);
+            $('#edit_sg_final_grade').val(studentGradeData.sg_final_grade);
+            $('#edit_sg_status').val(studentGradeData.sg_status);
+            });
+        });
+
+
+        $('#submitFormBtn').on('click', function () {
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var student_gradeData = {
+                sg_student_id: $('#sg_student_id').val(),
+                sg_subject_id: $('#sg_subject_id').val(),
+                sg_school_year: $('#sg_school_year').val(),
+                sg_term: $('#sg_term').val(),
+                sg_grades: $('#sg_grades').val(),
+                sg_final_grade: $('#sg_final_grade').val(),
+                sg_status: $('#sg_status').val()
+                
+            };
+            for (var key in student_gradeData) {
+            if (student_gradeData[key] === '') {
+                $('#requiredFieldsModal').modal('show');
+                $('#confirmInsertModal').modal('hide');
+                return;
+            }
+            }
+            $.ajax({
+                url: '/student_grade/post-student-grade',
+                type: 'POST',
+                data: student_gradeData,
+                success: function (response) {
+                    console.log('Student Grade data inserted successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error inserting student data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+        });
+
+
+        $(document).on('click', '.delete-btn', function () {
+            var student_gradeId = $(this).data('id');
+            $('#confirmDeleteModal').data('id', student_gradeId).modal('show');
+        });
+
+        $('#confirmDeleteBtn').on('click', function () {
+            var student_gradeId = $('#confirmDeleteModal').data('id');
+            deleteStudentGrade(student_gradeId);
+            $('#confirmDeleteModal').modal('hide');
+        });
+
+        function deleteStudentGrade(student_gradeId) {
+            if (!student_gradeId) {
+                console.error('Invalid student ID:', student_gradeId);
+                return;
+            }
+            $.ajax({
+                url: `/student_grade/delete-student-grade/${student_gradeId}`,
+                type: "DELETE",
+                success: function (response) {
+                    console.log(response.message);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error deleting student:', err);
+                }
+            });
+        }
+
+    });
+</script>

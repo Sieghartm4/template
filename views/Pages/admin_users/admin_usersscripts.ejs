@@ -1,0 +1,146 @@
+<script>
+    $(document).ready(function () {
+
+        LoadTable();
+
+        function LoadTable() {
+            console.log("LoadTable");
+
+            $.ajax({
+                url: "/admin_users/get-admin-users",
+                type: "GET",
+                success: function (data) {
+                    console.log(data.data);
+                    var table = $('#admin_table').DataTable();
+                    table.clear();
+                    data.data.forEach(element => {
+                        table.row.add([
+                            element.mu_id,
+                            element.mu_access_id,
+                            element.mu_fullname,
+                            element.mu_email,
+                            element.mu_username,
+                            `<div class="d-flex justify-content-around"><button type="button" class=" mx-3 btn btn-success w-100 edit-btn" data-mu_id="${element.mu_id}" data-mu_access_id="${element.mu_access_id}" data-mu_fullname="${element.mu_fullname}" data-mu_email="${element.mu_email}" data-mu_username="${element.mu_username}"><i class=" fas fa-fw fa-edit"></i></button> <button type="button"  class="btn btn-danger w-100 delete-btn" data-id="${element.mu_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+                        
+                        ]);
+                    });
+                    table.draw();
+                }
+            });
+        }
+
+        $('#save_edit').on('click', function () {
+            $('#confirmEditModal').modal('show');
+            $('#editAdminModal').modal('hide')
+        });
+        $(document).on('click', '#confirmEditBtn', function () {
+            $('#confirmEditModal').modal('hide');
+            
+            var mu_id = $('#edit_mu_id').val();
+            var editedAdminData = {
+            mu_access_id: $('#edit_mu_access_id').val(),
+            mu_fullname: $('#edit_mu_fullname').val(),
+            mu_email: $('#edit_mu_email').val(),
+            mu_username: $('#edit_mu_username').val()
+            };
+
+            console.log('Edited Admin Data:', editedAdminData);
+
+            $.ajax({
+                url: `/admin_users/put-admin-users/${mu_id}`,
+                type: 'PUT',
+                data: editedAdminData,
+                success: function (response) {
+                    console.log('Admin data updated successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error updating admin data:', err);
+                }
+            });
+
+            $('#editAdminModal').modal('hide');
+        });
+
+        $(document).on('click', '.edit-btn', function () {
+            var adminData = $(this).data();
+            $('#editAdminModal').modal('show').on('shown.bs.modal', function () {
+                $('#edit_mu_id').val(adminData.mu_id);
+                $('#edit_mu_access_id').val(adminData.mu_access_id);
+                $('#edit_mu_fullname').val(adminData.mu_fullname);
+                $('#edit_mu_email').val(adminData.mu_email);
+                $('#edit_mu_username').val(adminData.mu_username);
+                $('#edit_mu_password').val(adminData.mu_password);
+            });
+        });
+
+
+
+
+
+
+        $('#submitFormBtn').on('click', function () {
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var adminData = {
+                mu_access_id: $('#mu_access_id').val(),
+                mu_fullname: $('#mu_fullname').val(),
+                mu_email: $('#mu_email').val(),
+                mu_username: $('#mu_username').val(),
+                mu_password: $('#mu_password').val()
+                
+            };
+            for (var key in adminData) {
+            if (adminData[key] === '') {
+                $('#requiredFieldsModal').modal('show');
+                $('#confirmInsertModal').modal('hide');
+                return;
+            }
+            }
+            $.ajax({
+                url: '/admin_users/post-admin-users',
+                type: 'POST',
+                data: adminData,
+                success: function (response) {
+                    console.log('Admin data inserted successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error inserting admin data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+        });
+
+        $(document).on('click', '.delete-btn', function () {
+            var adminId = $(this).data('id');
+            $('#confirmDeleteModal').data('id', adminId).modal('show');
+        });
+
+        $('#confirmDeleteBtn').on('click', function () {
+            var adminId = $('#confirmDeleteModal').data('id');
+            deleteAdmin(adminId);
+            $('#confirmDeleteModal').modal('hide');
+        });
+
+        function deleteAdmin(adminId) {
+            if (!adminId) {
+                console.error('Invalid student ID:', adminId);
+                return;
+            }
+            $.ajax({
+                url: `/admin_users/delete-admin-users/${adminId}`,
+                type: "DELETE",
+                success: function (response) {
+                    console.log(response.message);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error deleting admin:', err);
+                }
+            });
+        }
+    });
+</script>

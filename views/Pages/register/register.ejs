@@ -1,0 +1,127 @@
+<!-- Begin Page Content -->
+<div class="container-fluid">
+
+
+    <br><br>
+    <div class="center">
+        <div class="row d-flex justify-content-center shadow col-xl-8 col-lg-8"
+            style="margin: 0; padding: 0; background-color: white;">
+            <div class="col-xl-6 col-lg-6"
+                style="margin: 0; padding: 0; border-radius:none; background: rgb(2,0,36);background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%);">
+                <div class=" mb-4 input overflow-auto">
+
+                    <div class="card-body" style="padding: 20%;">
+                        <h2 class="text-white text-center"><b>Welcome to Registration page!</b></h2>
+
+                        <br><br>
+                        <p class="text-white text-center">Please fill up the form to register </p>
+                        <p class="text-white text-center">Or if you already have an account, Please login to our page
+                            below.</p>
+                        <br>
+                        <a type="button" href="/login" class="btn text-white w-100" id="hover-button"
+                            style="border:white solid 3px;" id="loginBtn">Login</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-6" style="margin: 0; padding: 0;">
+                <div class=" mb-4 input overflow-auto">
+
+                    <div class="card-body" style="padding: 20%;">
+                        <h1 class="text-dark text-center"><b>Register</b></h1>
+                        <br>
+                        <form id="registerForm">
+                            <div class="mb-3">
+                                <label for="subjectid" class="form-label" style="font-weight: bold;color: black;">Full
+                                    Name</label>
+                                <input type="text" class="form-control" id="mu_fullname" name="mu_fullname"
+                                    placeholder="Aloysius Philip...">
+                            </div>
+                            <div class="mb-3">
+                                <label for="schoolyear" class="form-label"
+                                    style="font-weight: bold;color: black;">Email</label>
+                                <input type="email" class="form-control" id="mu_email" name="mu_email"
+                                    placeholder="sieghartm4@gmail.com...">
+                            </div>
+                            <div class="mb-3">
+                                <label for="term" class="form-label"
+                                    style="font-weight: bold;color: black;">Username</label>
+                                <input type="text" class="form-control" id="mu_username" name="mu_username"
+                                    placeholder="Sieghart...">
+                            </div>
+                            <div class="mb-3">
+                                <label for="grades" class="form-label"
+                                    style="font-weight: bold;color: black;">Password</label>
+                                <input type="password" class="form-control" id="mu_password" name
+                                    placeholder="pogiako123...">
+                            </div>
+                            <br>
+                            <div class="mb-3 text-center">
+                                <button type="button" class="btn btn-primary w-100 text-white" id="submitFormBtn" style=" background: rgb(2,0,36);background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(9,9,121,1) 35%, rgba(0,212,255,1) 100%);"><b>Submit</b></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br><br>
+    <!--  INSERT MODAL -->
+    <div class="modal fade" id="confirmInsertModal" tabindex="-1" role="dialog" aria-labelledby="confirmInserModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmInsertModalLabel">Confirm Insert</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to Insert this admin?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmInsertBtn">Insert</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- SUCCESS MODAL -->
+    <div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Account Created</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Your account has been successfully created.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- REQUIRED FIELDS MODAL -->
+    <div class="modal fade" id="requiredFieldsModal" tabindex="-1" role="dialog"
+        aria-labelledby="requiredFieldsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="requiredFieldsModalLabel">Required Fields Missing</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Please fill in all required fields before submitting the form.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>

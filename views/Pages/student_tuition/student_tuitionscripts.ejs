@@ -1,0 +1,142 @@
+<script>
+    $(document).ready(function () {
+
+        LoadTable();
+
+        function LoadTable() {
+            console.log("LoadTable");
+
+            $.ajax({
+                url: "/student_tuition/get-student-tuition",
+                type: "GET",
+                success: function (data) {
+                    console.log(data.data);
+                    var table = $('#student_tuition_table').DataTable();
+                    table.clear();
+                    data.data.forEach(element => {
+                        table.row.add([
+                            element.stf_id,
+                            element.stf_student_id,
+                            element.stf_school_year,
+                            element.stf_term,
+                            element.stf_total,
+                            element.stf_status,
+                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-stf_id="${element.stf_id}" data-stf_student_id="${element.stf_student_id}" data-stf_school_year="${element.stf_school_year}" data-stf_term="${element.stf_term}" data-stf_total="${element.stf_total}" data-stf_status="${element.stf_status}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.stf_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+
+                        ]);
+                    });
+                    table.draw();
+                }
+            });
+        }
+
+        $('#save_edit').on('click', function () {
+            $('#confirmEditModal').modal('show');
+            $('#editStudentModal').modal('hide');
+        });
+        $(document).on('click', '#confirmEditBtn', function () {
+            $('#confirmEditModal').modal('hide');
+            var stf_id = $('#edit_stf_id').val();
+            var editedStudentTuitionData = {
+                stf_id: stf_id,
+                stf_student_id: $('#edit_stf_student_id').val(),
+                stf_school_year: $('#edit_stf_school_year').val(),
+                stf_term: $('#edit_stf_term').val(),
+                stf_total: $('#edit_stf_total').val(),
+                stf_status: $('#edit_stf_status').val()
+            };
+
+            $.ajax({
+                url: `/student_tuition/put-student-tuition/${stf_id}`,
+                type: 'PUT',
+                data: editedStudentTuitionData,
+                success: function (response) {
+                    console.log('Student tuition data updated successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error updating student tuition data:', err);
+                }
+            });
+
+            $('#editStudentModal').modal('hide');
+        });
+
+        $(document).on('click', '.edit-btn', function () {
+            var studentTuitionData = $(this).data();
+            $('#editStudentModal').modal('show').on('shown.bs.modal', function () {
+                $('#edit_stf_id').val(studentTuitionData.stf_id);
+                $('#edit_stf_student_id').val(studentTuitionData.stf_student_id);
+                $('#edit_stf_school_year').val(studentTuitionData.stf_school_year);
+                $('#edit_stf_term').val(studentTuitionData.stf_term);
+                $('#edit_stf_total').val(studentTuitionData.stf_total);
+                $('#edit_stf_status').val(studentTuitionData.stf_status);
+            });
+        });
+
+        $('#submitFormBtn').on('click', function (event) {
+            event.preventDefault();
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var student_tuitionData = {
+                stf_student_id: $('#stf_student_id').val(),
+                stf_school_year: $('#stf_school_year').val(),
+                stf_term: $('#stf_term').val(),
+                stf_total: $('#stf_total').val(),
+                stf_status: $('#stf_status').val()
+            };
+            for (var key in student_tuitionData) {
+                if (student_tuitionData[key] === '') {
+                    $('#requiredFieldsModal').modal('show');
+                    $('#confirmInsertModal').modal('hide');
+                    return;
+                }
+            }
+            $.ajax({
+                url: '/student_tuition/post-student-tuition',
+                type: 'POST',
+                data: student_tuitionData,
+                success: function (response) {
+                    console.log('Student tuition data inserted successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error inserting student tuition data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+        });
+
+        $(document).on('click', '.delete-btn', function () {
+            var student_tuitionId = $(this).data('id');
+            $('#confirmDeleteModal').data('id', student_tuitionId).modal('show');
+        });
+
+        $('#confirmDeleteBtn').on('click', function () {
+            var student_tuitionId = $('#confirmDeleteModal').data('id');
+            deleteStudentTuition(student_tuitionId);
+            $('#confirmDeleteModal').modal('hide');
+        });
+
+        function deleteStudentTuition(student_tuitionId) {
+            if (!student_tuitionId) {
+                console.error('Invalid student ID:', student_tuitionId);
+                return;
+            }
+            $.ajax({
+                url: `/student_tuition/delete-student-tuition/${student_tuitionId}`,
+                type: "DELETE",
+                success: function (response) {
+                    console.log(response.message);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error deleting student tuition:', err);
+                }
+            });
+        }
+
+    });
+</script>

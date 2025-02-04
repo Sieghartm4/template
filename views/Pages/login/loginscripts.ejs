@@ -1,0 +1,36 @@
+<script>
+    $(document).ready(function () {
+        $('#submitFormBtn').on('click', function () {
+            $('#confirmInsertModal').modal('show');
+        });
+        $('#confirmInsertBtn').on('click', function () {
+            var loginData = {
+                mu_email: $('#mu_email').val(),
+                mu_password: $('#mu_password').val()
+            };
+
+            if (loginData.mu_email === '' || loginData.mu_password === '') {
+                $('#requiredFieldsModal').modal('show');
+                return;
+            }
+
+            $.ajax({
+                url: '/login/check-credentials',
+                type: 'POST',
+                data: loginData,
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = '/';
+                    } else {
+                        $('#loginErrorModal').modal('show');
+                        $('#confirmInsertModal').modal('hide')
+                    }
+                },
+                error: function () {
+                    $('#loginErrorModal').modal('show');
+                    $('#confirmInsertModal').modal('hide')
+                }
+            });
+        });
+    });
+</script>

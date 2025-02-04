@@ -1,0 +1,21 @@
+const jwt = require('jsonwebtoken');
+
+const verifyjwt = (req, res, next) => {
+    if (!req.session || !req.session.jwt) {
+        return res.redirect('/unauthorized');;
+        
+    }
+    try {
+        const token = req.session.jwt;
+        const decoded = jwt.verify(token, "sample");
+        req.user = {
+            mu_id: req.session.user.mu_id,
+            mu_email: req.session.user.mu_email
+        };
+        next();
+    } catch (error) {
+        return res.status(401).json({ message: "Invalid token" });
+    }
+};
+
+module.exports = verifyjwt;

@@ -1,0 +1,141 @@
+<script>
+    $(document).ready(function () {
+
+        LoadTable();
+
+        function LoadTable() {
+            console.log("LoadTable");
+
+            $.ajax({
+                url: "/subjects/get-master-subjects",
+                type: "GET",
+                success: function (data) {
+                    console.log(data.data);
+                    var table = $('#subject_table').DataTable();
+                    table.clear();
+                    data.data.forEach(element => {
+                        table.row.add([
+                            element.ms_id,
+                            element.ms_code,
+                            element.ms_description,
+                            element.ms_status,
+                            element.ms_created_by,
+                            element.ms_created_date,
+                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-ms_id="${element.ms_id}" data-ms_code="${element.ms_code}" data-ms_description="${element.ms_description}" data-ms_status="${element.ms_status}" data-ms_created_by="${element.ms_created_by}" data-ms_created_date="${element.ms_created_date}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.ms_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+                            
+                        ]);
+                    });
+                    table.draw();
+                }
+            });
+        }
+
+        $('#save_edit').on('click', function () {
+            $('#confirmEditModal').modal('show');
+            $('#editSubjectModal').modal('hide');
+        });
+        $(document).on('click', '#confirmEditBtn', function () {
+            $('#confirmEditModal').modal('hide');
+            var ms_id = $('#edit_ms_id').val();
+            var editedSubjectData = {
+                ms_code: $('#edit_ms_code').val(),
+                ms_description: $('#edit_ms_description').val(),
+                ms_status: $('#edit_ms_status').val(),
+                ms_created_by: $('#edit_ms_created_by').val(),
+                ms_created_date: $('#edit_ms_created_date').val()
+            };
+
+            console.log('Edited Subject Data:', editedSubjectData);
+
+            $.ajax({
+                url: `/subjects/put-master-subjects/${ms_id}`,
+                type: 'PUT',
+                data: editedSubjectData,
+                success: function (response) {
+                    console.log('Subject data updated successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error updating subject data:', err);
+                }
+            });
+
+            $('#editSubjectModal').modal('hide');
+        });
+
+        $(document).on('click', '.edit-btn', function () {
+            var subjectData = $(this).data();
+            $('#editSubjectModal').modal('show').on('shown.bs.modal', function () {
+                $('#edit_ms_id').val(subjectData.ms_id);
+                $('#edit_ms_code').val(subjectData.ms_code);
+                $('#edit_ms_description').val(subjectData.ms_description);
+                $('#edit_ms_status').val(subjectData.ms_status);
+                $('#edit_ms_created_by').val(subjectData.ms_created_by);
+                $('#edit_ms_created_date').val(subjectData.ms_created_date);
+            });
+        });
+
+        $('#submitFormBtn').on('click', function () {
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var subjectData = {
+                ms_code: $('#ms_code').val(),
+                ms_description: $('#ms_description').val(),
+                ms_status: $('#ms_status').val(),
+                ms_created_by: $('#ms_created_by').val(),
+                ms_created_date: $('#ms_created_date').val()
+            };
+            for (var key in subjectData) {
+                if (subjectData[key] === '') {
+                    $('#requiredFieldsModal').modal('show');
+                    $('#confirmInsertModal').modal('hide');
+                    return;
+                }
+            }
+            $.ajax({
+                url: '/subjects/post-master-subjects',
+                type: 'POST',
+                data: subjectData,
+                success: function (response) {
+                    console.log('Subject data inserted successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error inserting subject data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+        });
+
+        $(document).on('click', '.delete-btn', function () {
+            var subjectId = $(this).data('id');
+            $('#confirmDeleteModal').data('id', subjectId).modal('show');
+        });
+
+        $('#confirmDeleteBtn').on('click', function () {
+            var subjectId = $('#confirmDeleteModal').data('id');
+            deleteSubject(subjectId);
+            $('#confirmDeleteModal').modal('hide');
+        });
+
+        function deleteSubject(subjectId) {
+            if (!subjectId) {
+                console.error('Invalid subject ID:', subjectId);
+                return;
+            }
+            $.ajax({
+                url: `/subjects/delete-master-subjects/${subjectId}`,
+                type: "DELETE",
+                success: function (response) {
+                    console.log(response.message);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error deleting subject:', err);
+                }
+            });
+        }
+    });
+</script>

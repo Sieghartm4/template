@@ -1,0 +1,142 @@
+<script>
+    $(document).ready(function () {
+
+        LoadTable();
+
+        function LoadTable() {
+            console.log("LoadTable");
+
+            $.ajax({
+                url: "/student_users/get-student-users",
+                type: "GET",
+                success: function (data) {
+                    console.log(data.data);
+                    var table = $('#student_table').DataTable();
+                    table.clear();
+                    data.data.forEach(element => {
+                        table.row.add([
+                            element.su_id,
+                            element.su_student_id,
+                            element.su_username,
+                            element.su_password,
+                            element.su_status,
+                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-su_id="${element.su_id}" data-su_student_id="${element.su_student_id}" data-su_username="${element.su_username}" data-su_password="${element.su_password}" data-su_status="${element.su_status}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.su_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+                        ]);
+                    });
+                    table.draw();
+                }
+            });
+        }
+
+        $('#save_edit').on('click', function () {
+            $('#confirmEditModal').modal('show');
+            $('#editStudentModal').modal('hide');
+        });
+        $(document).on('click', '#confirmEditBtn', function () {
+            $('#confirmEditModal').modal('hide');
+            var su_id = $('#edit_su_id').val();
+            var editedStudentData = {
+            su_student_id: $('#edit_su_student_id').val(),
+            su_username: $('#edit_su_username').val(),
+            su_password: $('#edit_su_password').val(),
+            su_status: $('#edit_su_status').val()
+            };
+
+            console.log('Edited Student Data:', editedStudentData);
+
+            $.ajax({
+                url: `/student_users/put-student-users/${su_id}`,
+                type: 'PUT',
+                data: editedStudentData,
+                success: function (response) {
+                    console.log('Student data updated successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error updating admin data:', err);
+                }
+            });
+
+            $('#editStudentModal').modal('hide');
+        });
+
+        $(document).on('click', '.edit-btn', function () {
+            var adminData = $(this).data();
+            $('#editStudentModal').modal('show').on('shown.bs.modal', function () {
+                $('#edit_su_id').val(adminData.su_id);
+                $('#edit_su_student_id').val(adminData.su_student_id);
+                $('#edit_su_username').val(adminData.su_username);
+                $('#edit_su_password').val(adminData.su_password);
+                $('#edit_su_status').val(adminData.su_status);
+            });
+        });
+
+
+
+
+
+
+        $('#submitFormBtn').on('click', function () {
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var studentData = {
+                su_student_id: $('#su_student_id').val(),
+                su_username: $('#su_username').val(),
+                su_password: $('#su_password').val(),
+                su_status: $('#su_status').val()
+                
+            };
+            for (var key in studentData) {
+            if (studentData[key] === '') {
+                $('#requiredFieldsModal').modal('show');
+                $('#confirmInsertModal').modal('hide');
+                return;
+            }
+            }
+            $.ajax({
+                url: '/student_users/post-student-users',
+                type: 'POST',
+                data: studentData,
+                success: function (response) {
+                    console.log('Student data inserted successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error inserting student data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+        });
+
+        $(document).on('click', '.delete-btn', function () {
+            var studentId = $(this).data('id');
+            $('#confirmDeleteModal').data('id', studentId).modal('show');
+        });
+
+        $('#confirmDeleteBtn').on('click', function () {
+            var studentId = $('#confirmDeleteModal').data('id');
+            deleteStudent(studentId);
+            $('#confirmDeleteModal').modal('hide');
+        });
+
+        function deleteStudent(studentId) {
+            if (!studentId) {
+                console.error('Invalid student ID:', studentId);
+                return;
+            }
+            $.ajax({
+                url: `/student_users/delete-student-users/${studentId}`,
+                type: "DELETE",
+                success: function (response) {
+                    console.log(response.message);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error deleting student:', err);
+                }
+            });
+        }
+    });
+</script>
