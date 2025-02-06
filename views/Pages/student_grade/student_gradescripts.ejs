@@ -32,6 +32,44 @@
             });
         }
 
+
+        $.ajax({
+            url: "/student_grade/get-student-info",
+            type: "GET",
+            success: function (data) {
+            var studentSelect = $('#sg_student_id');
+            var editStudentSelect = $('#edit_sg_student_id');
+            studentSelect.empty();
+            editStudentSelect.empty();
+            data.data.forEach(student => {
+                studentSelect.append(`<option value="${student.ms_student_id}">${student.ms_first_name}</option>`);
+                editStudentSelect.append(`<option value="${student.ms_student_id}">${student.ms_first_name}</option>`);
+            });
+            },
+            error: function (err) {
+            console.error('Error fetching student info:', err);
+            }
+        });
+
+        $.ajax({
+            url: "/student_grade/get-student-subject",
+            type: "GET",
+            success: function (data) {
+            var subjectSelect = $('#sg_subject_id');
+            var editSubjectSelect = $('#edit_sg_subject_id');
+            subjectSelect.empty();
+            editSubjectSelect.empty();
+            data.data.forEach(subject => {
+                subjectSelect.append(`<option value="${subject.ms_id}">${subject.ms_description}</option>`);
+                editSubjectSelect.append(`<option value="${subject.ms_id}">${subject.ms_description}</option>`);
+            });
+            },
+            error: function (err) {
+            console.error('Error fetching subject info:', err);
+            }
+        });
+
+
         $('#save_edit').on('click', function () {
             $('#confirmEditModal').modal('show');
             $('#editStudentModal').modal('hide');

@@ -28,10 +28,37 @@
             });
         }
 
+
+        $.ajax({
+            url: "/student_users/get-student-info",
+            type: "GET",
+            success: function (data) {
+            var studentSelect = $('#su_student_id');
+            var editStudentSelect = $('#edit_su_student_id');
+            studentSelect.empty();
+            editStudentSelect.empty();
+            data.data.forEach(student => {
+                studentSelect.append(`<option value="${student.ms_student_id}">${student.ms_first_name}</option>`);
+                editStudentSelect.append(`<option value="${student.ms_student_id}">${student.ms_first_name}</option>`);
+            });
+            },
+            error: function (err) {
+            console.error('Error fetching subject info:', err);
+            }
+        });
+
+
         $(document).on('click', '.see-btn', function () {
             var studentId = $(this).data('id');
-            $('#seeStudentModal').modal('show');
             console.log('STUDENT ID:', studentId);
+            var row = $(this).closest('tr');
+
+            $('#student_table tbody tr').each(function () {
+                $(this).find('td').eq(1).css('background-color', '');
+                $(this).find('td').eq(1).css('color', '');
+            });
+            row.find('td').eq(1).css('background-color', '#1cc88a');
+            row.find('td').eq(1).css('color', '#ffffff');
 
             $.ajax({
                 url: `/student_users/get-student-grade/${studentId}`,
@@ -44,8 +71,10 @@
                             url: `/student_users/get-student-subject/${element.sg_subject_id}`,
                             type: "GET"
                         }).then(subjectData => {
+                            console.log('Subject Data:', subjectData);
                             subjectData.data.forEach(subject => {
                                 table.row.add([
+                                    element.sg_student_id,
                                     element.sg_school_year,
                                     element.sg_term,
                                     subject.ms_description,
@@ -58,6 +87,12 @@
                     });
                     Promise.all(promises).then(() => {
                         table.draw();
+                        $('#student_grade_table tbody tr').each(function () {
+                            if ($(this).find('td').eq(0).text() === studentId.toString()) {
+                                $(this).find('td').eq(0).css('background-color', '#1cc88a');
+                                $(this).find('td').eq(0).css('color', '#ffffff');
+                            }
+                        });
                     }).catch(err => {
                         console.error('Error fetching subject data:', err);
                     });
@@ -74,10 +109,10 @@
             $('#confirmEditModal').modal('hide');
             var su_id = $('#edit_su_id').val();
             var editedStudentData = {
-            su_student_id: $('#edit_su_student_id').val(),
-            su_username: $('#edit_su_username').val(),
-            su_password: $('#edit_su_password').val(),
-            su_status: $('#edit_su_status').val()
+                su_student_id: $('#edit_su_student_id').val(),
+                su_username: $('#edit_su_username').val(),
+                su_password: $('#edit_su_password').val(),
+                su_status: $('#edit_su_status').val()
             };
 
             console.log('Edited Student Data:', editedStudentData);
@@ -124,14 +159,14 @@
                 su_username: $('#su_username').val(),
                 su_password: $('#su_password').val(),
                 su_status: $('#su_status').val()
-                
+
             };
             for (var key in studentData) {
-            if (studentData[key] === '') {
-                $('#requiredFieldsModal').modal('show');
-                $('#confirmInsertModal').modal('hide');
-                return;
-            }
+                if (studentData[key] === '') {
+                    $('#requiredFieldsModal').modal('show');
+                    $('#confirmInsertModal').modal('hide');
+                    return;
+                }
             }
             $.ajax({
                 url: '/student_users/post-student-users',

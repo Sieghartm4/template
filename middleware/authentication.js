@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 const verifyjwt = (req, res, next) => {
     if (!req.session || !req.session.jwt) {
-        return res.redirect('/unauthorized');;
+        return res.redirect('/unauthorized');
         
     }
     try {
@@ -14,7 +14,7 @@ const verifyjwt = (req, res, next) => {
         };
         next();
     } catch (error) {
-        return res.status(401).json({ message: "Invalid token" });
+        return res.redirect('/login');;
     }
 };
 

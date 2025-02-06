@@ -21,7 +21,7 @@
                             element.stf_term,
                             element.stf_total,
                             element.stf_status,
-                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-stf_id="${element.stf_id}" data-stf_student_id="${element.stf_student_id}" data-stf_school_year="${element.stf_school_year}" data-stf_term="${element.stf_term}" data-stf_total="${element.stf_total}" data-stf_status="${element.stf_status}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.stf_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="btn btn-primary w-100 see-btn" data-id="${element.stf_id}"><i style="" class=" fas fa-fw fa-eye"></i></button><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-stf_id="${element.stf_id}" data-stf_student_id="${element.stf_student_id}" data-stf_school_year="${element.stf_school_year}" data-stf_term="${element.stf_term}" data-stf_total="${element.stf_total}" data-stf_status="${element.stf_status}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.stf_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
 
                         ]);
                     });
@@ -30,6 +30,75 @@
             });
         }
 
+
+        $.ajax({
+            url: "/student_tuition/get-student-info",
+            type: "GET",
+            success: function (data) {
+            var studentSelect = $('#stf_student_id');
+            var editStudentSelect = $('#edit_stf_student_id');
+            studentSelect.empty();
+            editStudentSelect.empty();
+            data.data.forEach(student => {
+                studentSelect.append(`<option value="${student.ms_student_id}">${student.ms_first_name}</option>`);
+                editStudentSelect.append(`<option value="${student.ms_student_id}">${student.ms_first_name}</option>`);
+            });
+            },
+            error: function (err) {
+            console.error('Error fetching subject info:', err);
+            }
+        });
+
+        $(document).on('click', '.see-btn', function () {
+            var tuitionId = $(this).data('id');
+            console.log('TUITION ID:', tuitionId);
+            var row = $(this).closest('tr');
+
+            $('#student_tuition_table tbody tr').each(function () {
+                $(this).find('td').eq(0).css('background-color', '');
+                $(this).find('td').eq(0).css('color', '');
+            });
+            row.find('td').eq(0).css('background-color', '#1cc88a');
+            row.find('td').eq(0).css('color', '#ffffff');
+
+            $.ajax({
+                url: `/student_tuition/get-student-transaction/${tuitionId}`,
+                type: "GET",
+                success: function (data) {
+                    console.log('Transaction Data:', data.data);
+                    var table = $('#transaction_table').DataTable();
+                    table.clear();
+                    var promises = data.data.map(element => {
+                            console.log('TUITION Data:', element.ttf_tuition_fee_id);
+                                table.row.add([
+                                    element.ttf_tuition_fee_id,
+                                    element.ttf_mode_of_payment,
+                                    element.ttf_amount,
+                                    element.ttf_previous_balance,
+                                    element.ttf_current_balance,
+                                    element.ttf_received_by,
+                                    element.ttf_paid_by,
+                                ]);
+
+                    });
+                    Promise.all(promises).then(() => {
+                        table.draw();
+                        $('#transaction_table tbody tr').each(function () {
+                            if ($(this).find('td').eq(0).text() === tuitionId.toString()) {
+                                $(this).find('td').eq(0).css('background-color', '#1cc88a');
+                                $(this).find('td').eq(0).css('color', '#ffffff');
+                            }
+                        });
+                    }).catch(err => {
+                        console.error('Error fetching subject data:', err);
+                    });
+                }
+            });
+        });
+
+
+
+        
         $('#save_edit').on('click', function () {
             $('#confirmEditModal').modal('show');
             $('#editStudentModal').modal('hide');

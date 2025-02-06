@@ -65,6 +65,33 @@ router.get('/get-student-users',(req, res) => {
   }
 });
 
+
+router.get('/get-student-info',(req, res) => {  
+  try {
+    let sql = "SELECT * FROM master_student";
+
+    SELECT(sql, (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
+/**
+ * @swagger
+ * /student_users/get-student-grade/{sg_id}:
+ *   get:
+ *     summary: Get a student grade by ID
+ */
 router.get('/get-student-grade/:sg_id', (req, res) => {  
   try {
     const { sg_id } = req.params;

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var {SELECT} = require('./repository/db_connect');
+var {SELECT2} = require('./repository/db_connect');
 var {UPDATE} = require('./repository/db_connect');
 var {INSERT} = require('./repository/db_connect');
 var {DELETE} = require('./repository/db_connect');
@@ -15,6 +16,45 @@ module.exports = router;
 router.get('/get-student-tuition',(req, res) => {  
   try {
     let sql = "SELECT * FROM student_tuition_fee";
+
+    SELECT(sql, (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
+router.get('/get-student-transaction/:ttf_id',(req, res) => {  
+  try {
+    const { ttf_id } = req.params;
+    let sql = "SELECT * FROM transaction_tuition_fee WHERE ttf_tuition_fee_id = ?";
+
+    SELECT2(sql, [ttf_id],  (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
+router.get('/get-student-info',(req, res) => {  
+  try {
+    let sql = "SELECT * FROM master_student";
 
     SELECT(sql, (err, result) => {
       if (err) {

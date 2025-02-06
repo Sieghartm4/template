@@ -31,6 +31,43 @@
                 }
             });
         }
+
+
+        $.ajax({
+            url: "/transaction_tuition/get-student-tuition",
+            type: "GET",
+            success: function (data) {
+            var studentSelect = $('#ttf_tuition_fee_id');
+            var editStudentSelect = $('#edit_ttf_tuition_fee_id');
+            studentSelect.empty();
+            editStudentSelect.empty();
+            data.data.forEach(student => {
+                console.log('STUDENT ID:', student.stf_student_id);
+                $.ajax({
+                url: `/transaction_tuition/get-student-info/${student.stf_student_id}`,
+                type: "GET",
+                success: function (studentInfo) {
+                    studentInfo.data.forEach(studentI => {
+                    console.log('STUDENT INFO:', studentI.ms_id);
+                    studentSelect.append(`<option value="${student.stf_id}">${studentI.ms_first_name}</option>`);
+                    editStudentSelect.append(`<option value="${student.stf_id}">${studentI.ms_first_name}</option>`);
+                    });
+                },
+                error: function (err) {
+                    console.error('Error fetching student info:', err);
+                }
+                });
+            });
+            },
+            error: function (err) {
+            console.error('Error fetching student tuition:', err);
+            }
+        });
+
+
+        
+
+
         $('#save_edit').on('click', function () {
             $('#confirmEditModal').modal('show');
             $('#editTransactionModal').modal('hide');

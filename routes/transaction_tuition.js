@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var {SELECT} = require('./repository/db_connect');
+var {SELECT2} = require('./repository/db_connect');
 var {UPDATE} = require('./repository/db_connect');
 var {INSERT} = require('./repository/db_connect');
 var {DELETE} = require('./repository/db_connect');
@@ -19,6 +20,46 @@ router.get('/get-transaction-tuition', (req, res) => {
     let sql = "SELECT * FROM transaction_tuition_fee";
 
     SELECT(sql, (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
+router.get('/get-student-tuition', (req, res) => {  
+  try {
+    let sql = "SELECT * FROM student_tuition_fee";
+
+    SELECT(sql, (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
+router.get('/get-student-info/:ms_id', (req, res) => {  
+  try {
+    const { ms_id } = req.params;
+    console.log('STUDENT ID front',ms_id);
+    let sql = "SELECT * FROM master_student WHERE ms_student_id = ?";
+
+    SELECT2(sql, [ms_id], (err, result) => {
       if (err) {
         res.status(500).json({message: err});
       } else {

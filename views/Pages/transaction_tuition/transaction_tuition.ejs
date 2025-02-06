@@ -25,8 +25,10 @@
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
                                         <label for="ttf_tuition_fee_id" class="form-label">Tuition Fee ID</label>
-                                        <input type="text" class="form-control" id="ttf_tuition_fee_id"
-                                            placeholder="Enter tuition fee ID">
+                                        <select name="ttf_tuition_fee_id" id="ttf_tuition_fee_id" class="form-select w-100 p-1"
+                                            aria-label="Default select example" style="border-radius:5px;" required>
+                                            <option value="" disabled selected>Select Student Tuition</option>
+                                        </select>
                                     </div>
                                     <div class="col-md-4 mb-3">
                                         <label for="ttf_mode_of_payment" class="form-label">Mode Of Payment</label>
@@ -132,7 +134,10 @@
                         <input type="hidden" id="edit_ttf_id" name="edit_ttf_id">
                         <div class="form-group">
                             <label for="edit_ttf_tuition_fee_id" class="form-label">Tuition Fee ID</label>
-                            <input type="text" class="form-control" id="edit_ttf_tuition_fee_id" name="edit_ttf_tuition_fee_id" required>
+                            <select name="edit_ttf_tuition_fee_id" id="edit_ttf_tuition_fee_id" class="form-select w-100 p-1"
+                                            aria-label="Default select example" style="border-radius:5px;" required>
+                                            <option value="" disabled selected>Select Student Tuition</option>
+                                        </select>
                         </div>
                         <div class="form-group">
                             <label for="edit_ttf_mode_of_payment" class="form-label">Mode Of Payment</label>
