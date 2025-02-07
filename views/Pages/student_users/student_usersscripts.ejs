@@ -13,17 +13,31 @@
                     console.log(data.data);
                     var table = $('#student_table').DataTable();
                     table.clear();
-                    data.data.forEach(element => {
-                        table.row.add([
-                            element.su_id,
-                            element.su_student_id,
-                            element.su_username,
-                            element.su_password,
-                            element.su_status,
+                    var promises = data.data.map(element => {
+
+                        return $.ajax({
+                            url: `/student_users/get-student-firstname/${element.su_student_id}`,
+                            type: "GET"
+                        }).then(studentData =>{
+                            console.log(element.su_student_id)
+                            studentData.data.forEach(student=>{
+                                table.row.add([
+                                    element.su_id,
+                                    student.ms_first_name,
+                                    element.su_username,
+                                    element.su_password,
+                                    element.su_status,
                             `<div class="d-flex justify-content-center align-items-center"><button type="button" class="btn btn-primary w-100 see-btn" data-id="${element.su_student_id}"><i style="" class=" fas fa-fw fa-eye"></i></button><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-su_id="${element.su_id}" data-su_student_id="${element.su_student_id}" data-su_username="${element.su_username}" data-su_password="${element.su_password}" data-su_status="${element.su_status}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.su_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
                         ]);
+                            });
+                        });
+                        
                     });
-                    table.draw();
+                    Promise.all(promises).then(() => {
+                        table.draw();
+                    }).catch(err => {
+                        console.error('Error fetching user data:', err);
+                    });
                 }
             });
         }
@@ -50,15 +64,8 @@
 
         $(document).on('click', '.see-btn', function () {
             var studentId = $(this).data('id');
-            console.log('STUDENT ID:', studentId);
             var row = $(this).closest('tr');
-
-            $('#student_table tbody tr').each(function () {
-                $(this).find('td').eq(1).css('background-color', '');
-                $(this).find('td').eq(1).css('color', '');
-            });
-            row.find('td').eq(1).css('background-color', '#1cc88a');
-            row.find('td').eq(1).css('color', '#ffffff');
+            $('#StudentModal').modal('show');
 
             $.ajax({
                 url: `/student_users/get-student-grade/${studentId}`,
@@ -71,28 +78,20 @@
                             url: `/student_users/get-student-subject/${element.sg_subject_id}`,
                             type: "GET"
                         }).then(subjectData => {
-                            console.log('Subject Data:', subjectData);
                             subjectData.data.forEach(subject => {
                                 table.row.add([
-                                    element.sg_student_id,
                                     element.sg_school_year,
                                     element.sg_term,
                                     subject.ms_description,
                                     element.sg_grades,
                                     element.sg_final_grade,
-                                    element.sg_status,
+                                    `<span class="badge rounded-pill text-white ${element.sg_status === 'Passed' ? 'bg-success' : 'bg-danger'}">${element.sg_status}</span>`,
                                 ]);
                             });
                         });
                     });
                     Promise.all(promises).then(() => {
                         table.draw();
-                        $('#student_grade_table tbody tr').each(function () {
-                            if ($(this).find('td').eq(0).text() === studentId.toString()) {
-                                $(this).find('td').eq(0).css('background-color', '#1cc88a');
-                                $(this).find('td').eq(0).css('color', '#ffffff');
-                            }
-                        });
                     }).catch(err => {
                         console.error('Error fetching subject data:', err);
                     });

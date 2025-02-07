@@ -1,0 +1,182 @@
+<script>
+    $(document).ready(function () {
+
+        LoadTable();
+
+        function LoadTable() {
+            console.log("LoadTable");
+
+            $.ajax({
+                url: "/subjects_price/get-subjects-price",
+                type: "GET",
+                success: function (data) {
+                    console.log(data.data);
+                    var table = $('#subject_price_table').DataTable();
+                    table.clear();
+                    var promises = data.data.map(element => {
+                        return $.ajax({
+                            url: `/subjects_price/get-subjects-description/${element.msp_subject_id}`,
+                            type: "GET"
+                        }).then(subjectData=>{
+                            subjectData.data.forEach(subject => {
+                                table.row.add([
+                                    element.msp_id,
+                                    subject.ms_description,
+                                    `<span class="text-success">₱${element.msp_price}</span>`,
+                                    element.msp_no_unit,
+                                    element.msp_no_of_hour,
+                                    element.msp_status,
+                                    element.msp_created_by,
+                                    element.msp_created_date,
+                                    `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-msp_id="${element.msp_id}" data-msp_subject_id="${element.msp_subject_id}" data-msp_price="${element.msp_price}" data-msp_no_unit="${element.msp_no_unit}" data-msp_no_of_hour="${element.msp_no_of_hour}" data-msp_status="${element.msp_status}" data-msp_created_by="${element.msp_created_by}" ><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.msp_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+                        ]);
+
+                            });
+                        });
+
+
+
+                    });
+                    Promise.all(promises).then(() => {
+                        table.draw();
+                    }).catch(err => {
+                        console.error('Error fetching subject data:', err);
+                    });
+                }
+            });
+        }
+
+        
+        $.ajax({
+            url: "/subjects_price/get-subjects",
+            type: "GET",
+            success: function (data) {
+            var subjectSelect = $('#msp_subject_id');
+            var editSubjectSelect = $('#edit_msp_subject_id');
+            subjectSelect.empty();
+            editSubjectSelect.empty();
+            data.data.forEach(subject => {
+                subjectSelect.append(`<option value="${subject.ms_id}">${subject.ms_description}</option>`);
+                editSubjectSelect.append(`<option value="${subject.ms_id}">${subject.ms_description}</option>`);
+            });
+            },
+            error: function (err) {
+            console.error('Error fetching subject info:', err);
+            }
+        });
+
+
+
+        $('#save_edit').on('click', function () {
+            $('#confirmEditModal').modal('show');
+            $('#editSubjectPriceModal').modal('hide');
+        });
+        $(document).on('click', '#confirmEditBtn', function () {
+            $('#confirmEditModal').modal('hide');
+            var msp_id = $('#edit_msp_id').val();
+            var editedSubjectData = {
+                msp_subject_id: $('#edit_msp_subject_id').val(),
+                msp_price: $('#edit_msp_price').val(),
+                msp_no_unit: $('#edit_msp_no_unit').val(),
+                msp_no_of_hour: $('#edit_msp_no_of_hour').val(),
+                msp_status: $('#edit_msp_status').val(),
+                msp_created_by: $('#edit_msp_created_by').val()
+            };
+
+            console.log('Edited Subject Data:', editedSubjectData);
+
+            $.ajax({
+                url: `/subjects_price/put-subjects-price/${msp_id}`,
+                type: 'PUT',
+                data: editedSubjectData,
+                success: function (response) {
+                    console.log('Subject data updated successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error updating subject data:', err);
+                }
+            });
+
+            $('#editSubjectModal').modal('hide');
+        });
+
+        $(document).on('click', '.edit-btn', function () {
+            var subjectData = $(this).data();
+            $('#editSubjectPriceModal').modal('show').on('shown.bs.modal', function () {
+                $('#edit_msp_id').val(subjectData.msp_id);
+                $('#edit_msp_subject_id').val(subjectData.msp_subject_id);
+                $('#edit_msp_price').val(subjectData.msp_price);
+                $('#edit_msp_no_unit').val(subjectData.msp_no_unit);
+                $('#edit_msp_no_of_hour').val(subjectData.msp_no_of_hour);
+                $('#edit_msp_status').val(subjectData.msp_status);
+                $('#edit_msp_created_by').val(subjectData.msp_created_by);
+                $('#edit_msp_created_date').val(subjectData.msp_created_date);
+            });
+        });
+
+        $('#submitFormBtn').on('click', function () {
+            $('#confirmInsertModal').modal('show');
+        });
+
+        $('#confirmInsertBtn').on('click', function () {
+            var subjectData = {
+                msp_subject_id: $('#msp_subject_id').val(),
+                msp_price: $('#msp_price').val(),
+                msp_no_unit: $('#msp_no_unit').val(),
+                msp_no_of_hour: $('#msp_no_of_hour').val(),
+                msp_status: $('#msp_status').val(),
+                msp_created_by: $('#msp_created_by').val(),
+            };
+            for (var key in subjectData) {
+                if (subjectData[key] === '') {
+                    $('#requiredFieldsModal').modal('show');
+                    $('#confirmInsertModal').modal('hide');
+                    return;
+                }
+            }
+            $.ajax({
+                url: '/subjects_price/post-subjects-price',
+                type: 'POST',
+                data: subjectData,
+                success: function (response) {
+                    console.log('Subject data inserted successfully:', response);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error inserting subject data:', err);
+                }
+            });
+            $('#confirmInsertModal').modal('hide');
+        });
+
+        $(document).on('click', '.delete-btn', function () {
+            var subjectId = $(this).data('id');
+            $('#confirmDeleteModal').data('id', subjectId).modal('show');
+        });
+
+        $('#confirmDeleteBtn').on('click', function () {
+            var subjectId = $('#confirmDeleteModal').data('id');
+            deleteSubject(subjectId);
+            $('#confirmDeleteModal').modal('hide');
+        });
+
+        function deleteSubject(subjectId) {
+            if (!subjectId) {
+                console.error('Invalid subject ID:', subjectId);
+                return;
+            }
+            $.ajax({
+                url: `/subjects_price/delete-subjects-price/${subjectId}`,
+                type: "DELETE",
+                success: function (response) {
+                    console.log(response.message);
+                    LoadTable();
+                },
+                error: function (err) {
+                    console.error('Error deleting subject:', err);
+                }
+            });
+        }
+    });
+</script>

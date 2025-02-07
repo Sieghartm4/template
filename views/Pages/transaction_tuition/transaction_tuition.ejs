@@ -34,7 +34,7 @@
                                         <label for="ttf_mode_of_payment" class="form-label">Mode Of Payment</label>
                                         <select name="ttf_mode_of_payment" id="ttf_mode_of_payment" class="form-select w-100 p-1"
                                             aria-label="Default select example" style="border-radius:5px; ">
-                                            <option selected>Select Payment</option>
+                                            <option value="">Select Payment</option>
                                             <option value="CASH">CASH</option>
                                             <option value="CREDIT CARD">CREDIT CARD</option>
                                             <option value="DEBIT CARD">DEBIT CARD</option>
@@ -50,29 +50,13 @@
 
                                 <div class="row">
                                     <div class="col-md-4 mb-3">
-                                        <label for="ttf_previouse_balance" class="form-label">Previous Balance</label>
-                                        <input type="number" class="form-control" id="ttf_previous_balance"
-                                            placeholder="Enter previous balance">
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="ttf_current_balance" class="form-label">Current Balance</label>
-                                        <input type="number" class="form-control" id="ttf_current_balance"
-                                            placeholder="Enter current balance">
-                                    </div>
-                                    <div class="col-md-4 mb-3">
-                                        <label for="ttf_received_by" class="form-label">Received By</label>
-                                        <input type="text" class="form-control" id="ttf_received_by"
-                                            placeholder="Enter receiver name">
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
                                         <label for="ttf_paid_by" class="form-label">Paid By</label>
                                         <input type="text" class="form-control" id="ttf_paid_by"
                                             placeholder="Enter payer name">
                                     </div>
                                 </div>
+
+                                    
 
                                 <div class="mb-3 center">
                                     <button type="button" class="btn btn-primary w-50"
@@ -117,6 +101,25 @@
             </div>
         </div>
 
+    </div>
+    <!-- ALREADY PAID MODAL -->
+    <div class="modal fade" id="alreadyPaidModal" tabindex="-1" role="dialog" aria-labelledby="alreadyPaidModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="alreadyPaidModalLabel">Tuition Fully Paid</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Student tuition already fully paid.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
     <!-- EDIT MODAL -->
     <div class="modal fade" id="editTransactionModal" tabindex="-1" role="dialog" aria-labelledby="editTransactionModalLabel"

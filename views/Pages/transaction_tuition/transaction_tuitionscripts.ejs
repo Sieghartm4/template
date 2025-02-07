@@ -18,9 +18,9 @@
                             element.ttf_id,
                             element.ttf_tuition_fee_id,
                             element.ttf_mode_of_payment,
-                            element.ttf_amount,
-                            element.ttf_previous_balance,
-                            element.ttf_current_balance,
+                            `<span class="badge rounded-pill text-white bg-success">₱${element.ttf_amount}</span>`,
+                            `<span class="badge rounded-pill text-white bg-warning">₱${element.ttf_previous_balance}</span>`,
+                            `<span class="badge rounded-pill text-white bg-danger">₱${element.ttf_current_balance}</span>`,
                             element.ttf_received_by,
                             element.ttf_paid_by,
                             `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-ttf_id="${element.ttf_id}" data-ttf_tuition_fee_id="${element.ttf_tuition_fee_id}" data-ttf_mode_of_payment="${element.ttf_mode_of_payment}" data-ttf_amount="${element.ttf_amount}" data-ttf_previous_balance="${element.ttf_previous_balance}" data-ttf_current_balance="${element.ttf_current_balance}" data-ttf_received_by="${element.ttf_received_by}" data-ttf_paid_by="${element.ttf_paid_by}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.ttf_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
@@ -47,11 +47,13 @@
                 url: `/transaction_tuition/get-student-info/${student.stf_student_id}`,
                 type: "GET",
                 success: function (studentInfo) {
+                    
                     studentInfo.data.forEach(studentI => {
                     console.log('STUDENT INFO:', studentI.ms_id);
-                    studentSelect.append(`<option value="${student.stf_id}">${studentI.ms_first_name}</option>`);
-                    editStudentSelect.append(`<option value="${student.stf_id}">${studentI.ms_first_name}</option>`);
+                    studentSelect.append(`<option value="${student.stf_id}">${studentI.ms_first_name} ${student.stf_term}${student.stf_term === 1 ? 'st' : student.stf_term === 2 ? 'nd' : 'rd'} Term</option>`);
+                    editStudentSelect.append(`<option value="${student.stf_id}">${studentI.ms_first_name} ${student.stf_term}${student.stf_term === 1 ? 'st' : student.stf_term === 2 ? 'nd' : 'rd'} Term</option>`);
                     });
+                
                 },
                 error: function (err) {
                     console.error('Error fetching student info:', err);
@@ -126,9 +128,6 @@
                 ttf_tuition_fee_id: $('#ttf_tuition_fee_id').val(),
                 ttf_mode_of_payment: $('#ttf_mode_of_payment').val(),
                 ttf_amount: $('#ttf_amount').val(),
-                ttf_previous_balance: $('#ttf_previous_balance').val(),
-                ttf_current_balance: $('#ttf_current_balance').val(),
-                ttf_received_by: $('#ttf_received_by').val(),
                 ttf_paid_by: $('#ttf_paid_by').val()
             };
             for (var key in transaction_tuitionData) {
@@ -143,8 +142,13 @@
                 type: 'POST',
                 data: transaction_tuitionData,
                 success: function (response) {
+                    if (response.showModal) {
+                        $('#alreadyPaidModal').modal('show');
+                        $('#confirmInsertModal').modal('hide');
+                    } else {
                     console.log('Transaction tuition data inserted successfully:', response);
                     LoadTable();
+                    }
                 },
                 error: function (err) {
                     console.error('Error inserting transaction tuition data:', err);

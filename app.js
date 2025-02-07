@@ -16,6 +16,7 @@ var studentRouter = require('./routes/student_users');
 var student_infoRouter = require('./routes/student_info');
 var student_gradeRouter = require('./routes/student_grade');
 var subjectsRouter = require('./routes/subjects');
+var subjects_priceRouter = require('./routes/subjects_price');
 var student_tuitionRouter = require('./routes/student_tuition');
 var transaction_tuitionRouter = require('./routes/transaction_tuition');
 var registerRouter = require('./routes/register');
@@ -84,6 +85,7 @@ app.use('/student_users',verifyjwt, studentRouter);
 app.use('/student_info',verifyjwt, student_infoRouter);
 app.use('/student_grade',verifyjwt, student_gradeRouter);
 app.use('/subjects',verifyjwt, subjectsRouter);
+app.use('/subjects_price',verifyjwt, subjects_priceRouter);
 app.use('/student_tuition',verifyjwt, student_tuitionRouter);
 app.use('/transaction_tuition',verifyjwt, transaction_tuitionRouter);
 

@@ -10,7 +10,8 @@ const verifyjwt = (req, res, next) => {
         const decoded = jwt.verify(token, "sample");
         req.user = {
             mu_id: req.session.user.mu_id,
-            mu_email: req.session.user.mu_email
+            mu_email: req.session.user.mu_email,
+            mu_fullname: req.session.user.mu_fullname
         };
         next();
     } catch (error) {

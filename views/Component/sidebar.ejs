@@ -54,14 +54,31 @@
             
             <span>Students</span>
         </a>
-        <div id="collapse2" class="collapse <%= currentRoute === '/student_users' || currentRoute === '/student_grade' || currentRoute === '/subjects' ? 'display' : '' %>" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+        <div id="collapse2" class="collapse <%= currentRoute === '/student_users' || currentRoute === '/student_grade' ? 'display' : '' %>" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <h6 class="collapse-header">Info:</h6>
                 <a class="collapse-item <%= currentRoute === '/student_users' ? 'clicked' : 'not-clicked' %>" href="/student_users">Student Users</a>
 
 
                 <a class="collapse-item <%= currentRoute === '/student_grade' ? 'clicked' : 'not-clicked' %>" href="/student_grade">Student Grade</a>
-                <a class="collapse-item <%= currentRoute === '/subjects' ? 'clicked' : 'not-clicked' %>" href="/subjects">Student Subjects</a>
+                   
+            </div>
+        </div>
+    </li>
+
+
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse3"
+            aria-expanded="true" aria-controls="collapseTwo">
+            <i class="fas fa-fw fa-address-card"></i>
+            
+            <span>Subjects</span>
+        </a>
+        <div id="collapse3" class="collapse <%= currentRoute === '/subjects' || currentRoute === '/subjects_price' ? 'display' : '' %>" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <h6 class="collapse-header">Info:</h6>
+                <a class="collapse-item <%= currentRoute === '/subjects' ? 'clicked' : 'not-clicked' %>" href="/subjects">Subjects</a>
+                <a class="collapse-item <%= currentRoute === '/subjects_price' ? 'clicked' : 'not-clicked' %>" href="/subjects_price">Subjects Price</a>
                 
             </div>
         </div>

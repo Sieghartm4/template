@@ -13,21 +13,38 @@
                     console.log(data.data);
                     var table = $('#student_grade_table').DataTable();
                     table.clear();
-                    data.data.forEach(element => {
-                        table.row.add([
-                            element.sg_id,
-                            element.sg_student_id,
-                            element.sg_subject_id,
-                            element.sg_school_year,
-                            element.sg_term,
-                            element.sg_grades,
-                            element.sg_final_grade,
-                            element.sg_status,
-                            `<div class="d-flex justify-content-center align-items-center" ><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-sg_id="${element.sg_id}" data-sg_student_id="${element.sg_student_id}" data-sg_subject_id="${element.sg_subject_id}" data-sg_school_year="${element.sg_school_year}" data-sg_term="${element.sg_term}" data-sg_grades="${element.sg_grades}" data-sg_final_grade="${element.sg_final_grade}" data-sg_status="${element.sg_status}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.sg_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
-                            
-                        ]);
+                    var promises = data.data.map(element => {
+                        return $.ajax({
+                            url: `/student_grade/get-student-firstname/${element.sg_student_id}`,
+                            type: "GET"
+                        }).then(studentData => {
+                            return $.ajax({
+                                url: `/student_grade/get-subject-description/${element.sg_subject_id}`,
+                                type: "GET"
+                            }).then(subjectData => {
+                                studentData.data.forEach(student => {
+                                    subjectData.data.forEach(subject => {
+                                        table.row.add([
+                                            element.sg_id,
+                                            student.ms_first_name,
+                                            subject.ms_description,
+                                            element.sg_school_year,
+                                            element.sg_term,
+                                            element.sg_grades,
+                                            element.sg_final_grade,
+                                            `<span class="badge rounded-pill text-white ${element.sg_status === 'Passed' ? 'bg-success' : 'bg-danger'}">${element.sg_status}</span>`,
+                                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-sg_id="${element.sg_id}" data-sg_student_id="${element.sg_student_id}" data-sg_subject_id="${element.sg_subject_id}" data-sg_school_year="${element.sg_school_year}" data-sg_term="${element.sg_term}" data-sg_grades="${element.sg_grades}" data-sg_final_grade="${element.sg_final_grade}" data-sg_status="${element.sg_status}"><i class="fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.sg_id}"><i class="fas fa-fw fa-trash"></i></button></div>`,
+                                        ]);
+                                    });
+                                });
+                            });
+                        });
                     });
-                    table.draw();
+                    Promise.all(promises).then(() => {
+                        table.draw();
+                    }).catch(err => {
+                        console.error('Error fetching user data:', err);
+                    });
                 }
             });
         }

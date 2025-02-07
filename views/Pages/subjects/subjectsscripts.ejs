@@ -18,10 +18,10 @@
                             element.ms_id,
                             element.ms_code,
                             element.ms_description,
-                            element.ms_status,
+                            `<span class="badge rounded-pill text-white ${element.ms_status === 'Active' ? 'bg-success' : 'bg-danger'}">${element.ms_status}</span>`,
                             element.ms_created_by,
                             element.ms_created_date,
-                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-ms_id="${element.ms_id}" data-ms_code="${element.ms_code}" data-ms_description="${element.ms_description}" data-ms_status="${element.ms_status}" data-ms_created_by="${element.ms_created_by}" data-ms_created_date="${element.ms_created_date}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.ms_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
+                            `<div class="d-flex justify-content-center align-items-center"><button type="button" class="btn btn-primary w-100 see-btn" data-id="${element.ms_id}" data-description="${element.ms_description}"><i style="" class=" fas fa-fw fa-eye"></i></button><button type="button" class="mx-3 btn btn-success w-100 edit-btn" data-ms_id="${element.ms_id}" data-ms_code="${element.ms_code}" data-ms_description="${element.ms_description}" data-ms_status="${element.ms_status}" data-ms_created_by="${element.ms_created_by}" data-ms_created_date="${element.ms_created_date}"><i class=" fas fa-fw fa-edit"></i></button><button type="button" class="btn btn-danger w-100 delete-btn" data-id="${element.ms_id}"><i class=" fas fa-fw fa-trash"></i></button></div>`,
                             
                         ]);
                     });
@@ -29,6 +29,47 @@
                 }
             });
         }
+
+        $(document).on('click', '.see-btn', function () {
+            var subjectId = $(this).data('id');
+            var subjectDescription = $(this).data('description');
+            $('#SubjectModal').modal('show');
+            var row = $(this).closest('tr');
+
+            $.ajax({
+            url: `/subjects/get-subjects-price/${subjectId}`,
+            type: "GET",
+            success: function (data) {
+                var table = $('#subject_price_table').DataTable();
+                table.clear();
+                var promises = data.data.map(element => {
+                return $.ajax({
+                    url: `/subjects/get-subjects-data/${element.msp_subject_id}`,
+                    type: "GET"
+                }).then(subjectData => {
+                    console.log('Subject Data:', subjectData);
+                    subjectData.data.forEach(subject => {
+                    table.row.add([
+                        subject.ms_description,
+                        `<span class="text-success">₱${element.msp_price}</span>`,
+                        element.msp_no_unit,
+                        element.msp_no_of_hour,
+                        `<span class="badge rounded-pill text-white ${element.msp_status === 'Active' ? 'bg-success' : 'bg-danger'}"> ${element.msp_status}</span>`,
+                        element.msp_created_by,
+                        element.msp_created_date,
+                    ]);
+                    });
+                });
+                });
+                Promise.all(promises).then(() => {
+                table.draw();
+                }).catch(err => {
+                console.error('Error fetching subject data:', err);
+                });
+            }
+            });
+        });
+
 
         $('#save_edit').on('click', function () {
             $('#confirmEditModal').modal('show');

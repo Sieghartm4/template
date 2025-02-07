@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var {SELECT} = require('./repository/db_connect');
+var {SELECT2} = require('./repository/db_connect');
 var {UPDATE} = require('./repository/db_connect');
 var {INSERT} = require('./repository/db_connect');
 var {DELETE} = require('./repository/db_connect');
@@ -19,6 +20,69 @@ router.get('/get-master-subjects', (req, res) => {
     let sql = "SELECT * FROM master_subject";
 
     SELECT(sql, (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
+router.get('/get-subjects-price/:msp_id', (req, res) => {  
+  try {
+    const {msp_id} = req.params;
+    let sql = "SELECT * FROM master_subject_price WHERE msp_subject_id = ?";
+
+    SELECT2(sql,[msp_id], (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
+router.get('/get-subjects-price/:msp_id', (req, res) => {  
+  try {
+    const {msp_id} = req.params;
+    let sql = "SELECT * FROM master_subject_price WHERE msp_subject_id = ?";
+
+    SELECT2(sql,[msp_id], (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
+router.get('/get-subjects-data/:ms_id', (req, res) => {  
+  try {
+    const {ms_id} = req.params;
+    let sql = "SELECT ms_description FROM master_subject WHERE ms_id = ?";
+
+    SELECT2(sql,[ms_id], (err, result) => {
       if (err) {
         res.status(500).json({message: err});
       } else {

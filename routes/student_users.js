@@ -132,6 +132,26 @@ router.get('/get-student-subject/:ms_id', (req, res) => {
   }
 });
 
+router.get('/get-student-firstname/:ms_student_id', (req, res) => {  
+  try {
+    const { ms_student_id } = req.params;
+    let sql = `SELECT ms_first_name FROM master_student WHERE ms_student_id = ?`;
+
+    SELECT2(sql, [ms_student_id], (err, result) => {
+      if (err) {
+        res.status(500).json({message: err});
+      } else {
+        res.status(200).json({
+          message: result,
+          data: result
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({message: error});
+  }
+});
+
 router.put('/put-student-users/:su_id', (req, res) => {  
   try {
     const { su_id } = req.params;

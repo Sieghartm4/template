@@ -38,14 +38,15 @@ router.post('/check-credentials', (req, res) => {
             }
 
             const token = jwt.sign(
-                { userId: result[0].mu_id, email: result[0].mu_email },
+                { userId: result[0].mu_id, email: result[0].mu_email, fullname: result[0].mu_fullname },
                 "sample",
                 { expiresIn: "1h" }
             );
 
             req.session.user = {
                 mu_id: result[0].mu_id,
-                mu_email: result[0].mu_email
+                mu_email: result[0].mu_email,
+                mu_fullname: result[0].mu_fullname
             };
             req.session.jwt = token;
 
