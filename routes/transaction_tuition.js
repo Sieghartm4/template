@@ -109,6 +109,7 @@ router.put('/put-transaction-tuition/:ttf_id', (req, res) => {
 router.post('/post-transaction-tuition', async (req, res) => {  
   try {
     const { ttf_tuition_fee_id, ttf_mode_of_payment, ttf_amount,  ttf_paid_by } = req.body;
+    const fullname = req.session.user.mu_fullname;
 
     let sql = "SELECT stf_total FROM student_tuition_fee WHERE stf_id = ?";
     let previousBalanceResult = await new Promise((resolve, reject) => {
